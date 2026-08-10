@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ns-plum: #3E2A45;
+    --ns-plum-dark: #2C1E32;
+    --ns-parchment: #EDE0C8;
+    --ns-rust: #Cb9c6e;
+    --ns-sand: #D8C0A0;
+    --ns-brown: #2A1E18;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Lora', serif;
+    background: var(--ns-plum);
+    color: var(--ns-parchment);
+  }
+  .hero {
+    position: relative;
+    min-height: 560px;
+    overflow: hidden;
+    background: radial-gradient(120% 140% at 15% 20%, var(--ns-plum) 0%, var(--ns-plum-dark) 100%);
+    display: flex;
+    align-items: center;
+    padding: 4rem 5vw;
+  }
+  .hero__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .hero.is-ready .hero__canvas { opacity: 1; }
+  .hero__content {
+    position: relative;
+    z-index: 3;
+    max-width: 640px;
+  }
+  .hero__eyebrow {
+    display: inline-block;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    color: var(--ns-sand);
+    margin-bottom: 0.85rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+  }
+  .hero__title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    color: var(--ns-parchment);
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+  }
+  .hero__title em {
+    color: var(--ns-rust);
+    font-style: normal;
+  }
+  .hero__subtitle {
+    font-size: 1.08rem;
+    line-height: 1.6;
+    color: var(--ns-parchment);
+    opacity: 0;
+    max-width: 46ch;
+    margin: 0 0 2rem;
+    transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+    transform: translateY(14px);
+  }
+  .hero.is-ready .hero__eyebrow,
+  .hero.is-ready .hero__title,
+  .hero.is-ready .hero__subtitle {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .hero__ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .hero__btn {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .hero__btn:hover { transform: translateY(-2px); }
+  .hero__btn--primary { background: var(--ns-rust); color: var(--ns-parchment); }
+  .hero__btn--primary:hover { background: #AC855E; }
+  .hero__btn--ghost { border-color: var(--ns-sand); color: var(--ns-parchment); }
+  .hero__btn--ghost:hover { background: rgba(216,192,160,0.12); }
+
+  /* Sits in the remaining space to the right of hero__content, so the badge
+     lands centered between the end of the text and the hero's right edge
+     regardless of viewport width. */
+  .hero__logo-slot {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+  }
+  .hero__logo-badge {
+    width: min(340px, 78%);
+    height: auto;
+    filter: drop-shadow(0 12px 32px rgba(0,0,0,0.45));
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
+  }
+  .hero.is-ready .hero__logo-badge { opacity: 1; transform: scale(1); }
+
+  @media (max-width: 720px) {
+    .hero { min-height: 460px; padding: 3rem 6vw; flex-direction: column; gap: 2rem; }
+    .hero__canvas { display: none; }
+    .hero__logo-slot { flex: none; width: 100%; }
+    .hero__logo-badge { width: 190px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__canvas { opacity: 0.6; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero" id="nsHero">
+  <canvas class="hero__canvas" id="nsCanvas"></canvas>
+  <div class="hero__content">
+    <span class="hero__eyebrow">Est. by readers, for readers</span>
+    <h1 class="hero__title">the <em>nightingale</em> society</h1>
+    <p class="hero__subtitle">A book club for people who read past midnight. We gather monthly to talk about the books we can't stop thinking about. This year, we're reading each other's words too.</p>
+    <div class="hero__ctas">
+      <a class="hero__btn hero__btn--primary" href="#writing-competition">Writing Competition</a>
+      <a class="hero__btn hero__btn--ghost" href="#join">Join Us</a>
+    </div>
+  </div>
+  <div class="hero__logo-slot">
+    <!--
+      Points at the local asset for preview purposes. Once you paste this
+      into Google Sites, replace this src with a hosted image URL (the embed
+      iframe can't reach a local file path there) — see README.md.
+    -->
+    <img class="hero__logo-badge" src="../assets/nightingale-logo-transparent.png" alt="The Nightingale Society logo: an illustrated nightingale perched on a branch">
+  </div>
+</section>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+
+const heroEl = document.getElementById('nsHero');
+const canvas = document.getElementById('nsCanvas');
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function rand(min, max) { return min + Math.random() * (max - min); }
+
+// Seeded 3D simplex noise — self-contained, no dependency. Gives the book
+// covers a slightly hand-drawn, faceted edge instead of perfectly clean box
+// geometry.
+function makeNoise3D(seed = 1) {
+  const grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+  const p = new Uint8Array(256);
+  let s = seed;
+  for (let i = 0; i < 256; i++) p[i] = i;
+  for (let i = 255; i > 0; i--) {
+    s = (s * 16807) % 2147483647;
+    const j = s % (i + 1);
+    [p[i], p[j]] = [p[j], p[i]];
+  }
+  const perm = new Uint8Array(512);
+  for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+  function dot(g, x, y, z) { return g[0]*x + g[1]*y + g[2]*z; }
+  return function noise(xin, yin, zin) {
+    const F3 = 1/3, G3 = 1/6;
+    const s = (xin+yin+zin)*F3;
+    const i = Math.floor(xin+s), j = Math.floor(yin+s), k = Math.floor(zin+s);
+    const t = (i+j+k)*G3;
+    const X0 = i-t, Y0 = j-t, Z0 = k-t;
+    const x0 = xin-X0, y0 = yin-Y0, z0 = zin-Z0;
+    let i1,j1,k1,i2,j2,k2;
+    if (x0>=y0) { if (y0>=z0){i1=1;j1=0;k1=0;i2=1;j2=1;k2=0;} else if (x0>=z0){i1=1;j1=0;k1=0;i2=1;j2=0;k2=1;} else {i1=0;j1=0;k1=1;i2=1;j2=0;k2=1;} }
+    else { if (y0<z0){i1=0;j1=0;k1=1;i2=0;j2=1;k2=1;} else if (x0<z0){i1=0;j1=1;k1=0;i2=0;j2=1;k2=1;} else {i1=0;j1=1;k1=0;i2=1;j2=1;k2=0;} }
+    const x1=x0-i1+G3, y1=y0-j1+G3, z1=z0-k1+G3;
+    const x2=x0-i2+2*G3, y2=y0-j2+2*G3, z2=z0-k2+2*G3;
+    const x3=x0-1+3*G3, y3=y0-1+3*G3, z3=z0-1+3*G3;
+    const ii=i&255, jj=j&255, kk=k&255;
+    const gi0 = grad3[perm[ii+perm[jj+perm[kk]]]%12];
+    const gi1 = grad3[perm[ii+i1+perm[jj+j1+perm[kk+k1]]]%12];
+    const gi2 = grad3[perm[ii+i2+perm[jj+j2+perm[kk+k2]]]%12];
+    const gi3 = grad3[perm[ii+1+perm[jj+1+perm[kk+1]]]%12];
+    let n0=0,n1=0,n2=0,n3=0;
+    let t0=0.6-x0*x0-y0*y0-z0*z0; if (t0>0){t0*=t0; n0=t0*t0*dot(gi0,x0,y0,z0);}
+    let t1=0.6-x1*x1-y1*y1-z1*z1; if (t1>0){t1*=t1; n1=t1*t1*dot(gi1,x1,y1,z1);}
+    let t2=0.6-x2*x2-y2*y2-z2*z2; if (t2>0){t2*=t2; n2=t2*t2*dot(gi2,x2,y2,z2);}
+    let t3=0.6-x3*x3-y3*y3-z3*z3; if (t3>0){t3*=t3; n3=t3*t3*dot(gi3,x3,y3,z3);}
+    return 32*(n0+n1+n2+n3);
+  };
+}
+const noise = makeNoise3D(7);
+
+function jitterGeometry(geo, amp) {
+  const pos = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const n = noise(v.x * 2.2, v.y * 2.2, v.z * 2.2);
+    v.addScaledVector(v.clone().normalize(), n * amp);
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function makeCoverGeometry(w, h, d) {
+  return jitterGeometry(new THREE.BoxGeometry(w, h, d, 2, 2, 1), 0.007);
+}
+
+function makePagesGeometry(w, h, d) {
+  return jitterGeometry(new THREE.BoxGeometry(w * 0.9, h * 0.9, d * 0.55, 2, 2, 1), 0.004);
+}
+
+// --- gradient ramp for toon shading (3 flat bands, like painted ink washes) ---
+function makeGradientMap() {
+  const c = document.createElement('canvas');
+  c.width = 3; c.height = 1;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#555'; ctx.fillRect(0,0,1,1);
+  ctx.fillStyle = '#aaa'; ctx.fillRect(1,0,1,1);
+  ctx.fillStyle = '#fff'; ctx.fillRect(2,0,1,1);
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.NearestFilter;
+  tex.magFilter = THREE.NearestFilter;
+  return tex;
+}
+
+// A proper 4-point twinkle sprite (soft glow halo + star spikes + bright
+// core) instead of a plain blurred dot — reads as a sparkle, not a smudge.
+function makeSparkleTexture() {
+  const size = 64;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const cx = size / 2, cy = size / 2;
+
+  const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.5);
+  glow.addColorStop(0, 'rgba(255,250,235,0.55)');
+  glow.addColorStop(1, 'rgba(255,250,235,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  const spikeGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
+  spikeGrad.addColorStop(0, 'rgba(255,255,255,1)');
+  spikeGrad.addColorStop(0.35, 'rgba(255,246,224,0.9)');
+  spikeGrad.addColorStop(1, 'rgba(255,246,224,0)');
+  ctx.fillStyle = spikeGrad;
+  ctx.beginPath();
+  ctx.moveTo(0, -size * 0.5);
+  ctx.quadraticCurveTo(size * 0.06, -size * 0.06, size * 0.5, 0);
+  ctx.quadraticCurveTo(size * 0.06, size * 0.06, 0, size * 0.5);
+  ctx.quadraticCurveTo(-size * 0.06, size * 0.06, -size * 0.5, 0);
+  ctx.quadraticCurveTo(-size * 0.06, -size * 0.06, 0, -size * 0.5);
+  ctx.closePath();
+  ctx.fill();
+
+  const coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.12);
+  coreGrad.addColorStop(0, 'rgba(255,255,255,1)');
+  coreGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  return new THREE.CanvasTexture(c);
+}
+
+let renderer, scene, camera, clock, running = false;
+
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearAlpha(0);
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  camera.position.set(0, 0, 6.5);
+
+  scene.add(new THREE.AmbientLight(0xfff3e0, 1.0));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.55);
+  dir.position.set(3, 4, 5);
+  scene.add(dir);
+  const fill = new THREE.DirectionalLight(0xD8C0A0, 0.35);
+  fill.position.set(-3, -2, 4);
+  scene.add(fill);
+
+  const gradientMap = makeGradientMap();
+  const sparkleTex = makeSparkleTexture();
+
+  function toonMat(hex) {
+    return new THREE.MeshToonMaterial({ color: hex, gradientMap, transparent: true });
+  }
+
+  function toonMatTextured(map) {
+    return new THREE.MeshToonMaterial({ map, gradientMap, transparent: true });
+  }
+
+  function outlineMat(thickness) {
+    return new THREE.ShaderMaterial({
+      uniforms: { thickness: { value: thickness }, opacity: { value: 1 } },
+      vertexShader: `uniform float thickness; void main(){ vec3 p = position + normalize(normal) * thickness; gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }`,
+      fragmentShader: `uniform float opacity; void main(){ gl_FragColor = vec4(0.086, 0.055, 0.098, opacity); }`,
+      side: THREE.BackSide,
+      transparent: true,
+    });
+  }
+
+  function buildPart(geo, material, outlineThickness = 0.02) {
+    const outline = new THREE.Mesh(geo, outlineMat(outlineThickness));
+    const body = new THREE.Mesh(geo, material);
+    const group = new THREE.Group();
+    group.add(outline, body);
+    return group;
+  }
+
+  function setGroupOpacity(group, v) {
+    group.traverse(obj => {
+      const mats = Array.isArray(obj.material) ? obj.material : obj.material ? [obj.material] : [];
+      for (const m of mats) {
+        if (m.uniforms && m.uniforms.opacity) m.uniforms.opacity.value = v;
+        else if ('opacity' in m) m.opacity = v;
+      }
+    });
+  }
+
+  function disposeGroup(group) {
+    group.traverse(obj => {
+      if (obj.geometry) obj.geometry.dispose();
+      const mats = Array.isArray(obj.material) ? obj.material : obj.material ? [obj.material] : [];
+      // Only dispose the material, not mat.map — cover textures are loaded
+      // once and reused across every book that spawns with that cover.
+      mats.forEach(m => m.dispose());
+    });
+  }
+
+  function buildBook(spec) {
+    const group = new THREE.Group();
+    const coverGeo = makeCoverGeometry(spec.w, spec.h, spec.d);
+    // BoxGeometry's default face groups are [+x, -x, +y, -y, +z, -z] — index
+    // 4 is the front face, where a cover texture reads right-side up.
+    let coverMat;
+    if (spec.coverTexture) {
+      const side = toonMat(spec.color);
+      coverMat = [side, side, side, side, toonMatTextured(spec.coverTexture), side];
+    } else {
+      coverMat = toonMat(spec.color);
+    }
+    group.add(buildPart(coverGeo, coverMat, 0.022));
+    const pages = buildPart(makePagesGeometry(spec.w, spec.h, spec.d), toonMat(0xF4ECDD), 0.012);
+    pages.position.x = spec.w * 0.09;
+    group.add(pages);
+    return group;
+  }
+
+  // Books, colored from the site's own palette (plus a few tints/shades of
+  // it) so they read as one system with the buttons, not a separate
+  // illustration style.
+  const RUST = 0x6B2E22, SAND = 0xD8C0A0, PARCHMENT = 0xEDE0C8, RUST_LIGHT = 0x8A4232;
+  const BROWN = 0x4A3524, PLUM_LIGHT = 0x7A5570, GOLD = 0xC9A876, RUST_DARK = 0x4E2018;
+  const BOOK_COLORS = [RUST, SAND, PARCHMENT, RUST_LIGHT, BROWN, PLUM_LIGHT, GOLD, RUST_DARK];
+  const SPARKLE_TINTS = [0xFFF6E0, PARCHMENT, SAND, GOLD];
+
+  // A few of the flying books show a real cover instead of a flat color —
+  // update this list whenever the current/past reads change (see
+  // embeds/reads-current-past.html and UPDATING-CONTENT.md). Accepts a
+  // direct image URL or a Google Drive "share" link.
+  function coverUrl(u) {
+    if (!u) return "";
+    const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
+    return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : u;
+  }
+  const COVER_URLS = [
+    "../assets/covers/project-hail-mary.png",
+    "../assets/covers/murder-orient-express.png",
+  ].map(coverUrl);
+  const textureLoader = new THREE.TextureLoader();
+  const bookCoverTextures = COVER_URLS.map(url => textureLoader.load(url));
+
+  function resize() {
+    const rect = heroEl.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  clock = new THREE.Clock();
+  const pointer = { target: { x: 0, y: 0 }, cur: { x: 0, y: 0 } };
+  window.addEventListener('pointermove', (e) => {
+    const rect = heroEl.getBoundingClientRect();
+    pointer.target.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    pointer.target.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+  });
+
+  let visible = true;
+  new IntersectionObserver((entries) => {
+    visible = entries[0].isIntersecting;
+    if (visible && !running && !document.hidden) frame();
+  }, { threshold: 0.05 }).observe(heroEl);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && visible && !running) frame();
+  });
+
+  function lerp3(p, q, t) { return [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t]; }
+
+  // A random point just off one of the four edges of the flight box, so
+  // chains can spawn from (and exit toward) any side, not just left-to-right.
+  function randomEdgePoint(box) {
+    const edge = Math.floor(Math.random() * 4);
+    if (edge === 0) return [box.x0, rand(box.y0, box.y1), rand(-0.3, 0.3)];
+    if (edge === 1) return [box.x1, rand(box.y0, box.y1), rand(-0.3, 0.3)];
+    if (edge === 2) return [rand(box.x0, box.x1), box.y1, rand(-0.3, 0.3)];
+    return [rand(box.x0, box.x1), box.y0, rand(-0.3, 0.3)];
+  }
+
+  // A flight path: swoop in from a random spot just off-canvas, loop once
+  // near the middle, swoop out toward another random off-canvas spot.
+  // Randomized every spawn so no two passes match.
+  function makeFlightPath() {
+    const box = { x0: -2.2, x1: 6.2, y0: -1.8, y1: 3.8 };
+    const start = randomEdgePoint(box);
+    const end = randomEdgePoint(box);
+    const loopX = rand(0.6, 3.4);
+    const loopY = rand(0.2, 2.6);
+    const loopZ = rand(-0.2, 0.2);
+    const r = rand(0.35, 0.5);
+    const loopCenter = [loopX, loopY, loopZ];
+    const preLoop = lerp3(start, loopCenter, 0.55);
+    const postLoop = lerp3(loopCenter, end, 0.45);
+
+    const pts = [
+      start,
+      preLoop,
+      [loopX - r, loopY - 0.1, loopZ],
+      [loopX - r * 0.3, loopY + r, loopZ + 0.15],
+      [loopX + r, loopY, loopZ - 0.1],
+      [loopX + r * 0.3, loopY - r, loopZ + 0.1],
+      [loopX - r * 0.5, loopY - r * 0.2, loopZ],
+      postLoop,
+      end,
+    ];
+    const curve = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p)));
+    curve.arcLengthDivisions = 300;
+    return curve;
+  }
+
+  const flights = [];
+  const sparkles = [];
+  let nextSpawnAt = 0.6;
+
+  function spawnFlight(t) {
+    const curve = makeFlightPath();
+    const count = 2 + Math.floor(Math.random() * 2);
+    const books = [];
+    for (let i = 0; i < count; i++) {
+      // About 4 in 10 books show a real cover — sized closer to an actual
+      // book's proportions so the art doesn't look stretched.
+      const useCover = bookCoverTextures.length > 0 && Math.random() < 0.4;
+      const spec = useCover
+        ? { w: rand(0.15, 0.19), d: 0.04, color: BOOK_COLORS[Math.floor(Math.random() * BOOK_COLORS.length)], coverTexture: bookCoverTextures[Math.floor(Math.random() * bookCoverTextures.length)] }
+        : { w: rand(0.14, 0.21), h: rand(0.19, 0.27), d: 0.047, color: BOOK_COLORS[Math.floor(Math.random() * BOOK_COLORS.length)] };
+      if (useCover) spec.h = spec.w * 1.5;
+      const g = buildBook(spec);
+      g.userData.spinX = rand(1.5, 3.2) * (Math.random() < 0.5 ? -1 : 1);
+      g.userData.spinY = rand(1.5, 3.2) * (Math.random() < 0.5 ? -1 : 1);
+      scene.add(g);
+      books.push({ g, offset: i * rand(0.05, 0.08) });
+    }
+    flights.push({ curve, books, start: t, duration: rand(5.5, 7.5), lastSparkle: 0, done: false });
+  }
+
+  function spawnSparkle(pos) {
+    const mat = new THREE.SpriteMaterial({
+      map: sparkleTex, transparent: true, depthWrite: false,
+      blending: THREE.AdditiveBlending, opacity: 0,
+      color: SPARKLE_TINTS[Math.floor(Math.random() * SPARKLE_TINTS.length)],
+      rotation: rand(0, Math.PI * 2),
+    });
+    const spr = new THREE.Sprite(mat);
+    spr.position.copy(pos).add(new THREE.Vector3(rand(-0.05, 0.05), rand(-0.05, 0.05), rand(-0.05, 0.05)));
+    const s = rand(0.035, 0.075);
+    spr.scale.set(0.0001, 0.0001, 1);
+    scene.add(spr);
+    sparkles.push({
+      spr, born: clock.elapsedTime, life: rand(0.55, 1.0), baseScale: s,
+      spin: rand(-2.2, 2.2),
+      drift: new THREE.Vector3(rand(-0.06, 0.06), rand(0.04, 0.14), rand(-0.06, 0.06)),
+    });
+  }
+
+  function frame() {
+    if (!visible || document.hidden) { running = false; return; }
+    running = true;
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+
+    if (!prefersReduced) {
+      if (t > nextSpawnAt && flights.filter(f => !f.done).length < 3) {
+        spawnFlight(t);
+        nextSpawnAt = t + rand(1.3, 2.8);
+      }
+
+      for (const flight of flights) {
+        if (flight.done) continue;
+        const t0 = (t - flight.start) / flight.duration;
+        if (t0 >= 1) {
+          flight.books.forEach(b => { scene.remove(b.g); disposeGroup(b.g); });
+          flight.done = true;
+          continue;
+        }
+        flight.books.forEach((b) => {
+          const bt = THREE.MathUtils.clamp(t0 - b.offset, 0, 1);
+          const pos = flight.curve.getPointAt(bt);
+          b.g.position.copy(pos);
+          b.g.rotation.x += b.g.userData.spinX * dt;
+          b.g.rotation.y += b.g.userData.spinY * dt;
+          const fade = Math.min(1, bt * 9) * Math.min(1, (1 - bt) * 9);
+          setGroupOpacity(b.g, fade);
+        });
+        if (t - flight.lastSparkle > 0.045 && flight.books.length) {
+          flight.lastSparkle = t;
+          spawnSparkle(flight.books[0].g.position);
+        }
+      }
+      for (let i = flights.length - 1; i >= 0; i--) {
+        if (flights[i].done) flights.splice(i, 1);
+      }
+
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        const age = (t - s.born) / s.life;
+        if (age >= 1) {
+          scene.remove(s.spr);
+          s.spr.material.dispose();
+          sparkles.splice(i, 1);
+          continue;
+        }
+        s.spr.material.opacity = 1 - age;
+        const sc = s.baseScale * (1 + age * 0.6);
+        s.spr.scale.set(sc, sc, 1);
+      }
+
+      pointer.cur.x += (pointer.target.x - pointer.cur.x) * 0.04;
+      pointer.cur.y += (pointer.target.y - pointer.cur.y) * 0.04;
+      camera.position.x = pointer.cur.x * 0.4;
+      camera.position.y = -pointer.cur.y * 0.25;
+      camera.lookAt(2.0, 1.0, 0);
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  frame();
+} catch (err) {
+  if (canvas) canvas.style.display = 'none';
+}
+
+requestAnimationFrame(() => heroEl.classList.add('is-ready'));
+</script>
+
+<script>
+  // Reports this page's real height to a parent window — used by the local
+  // preview.html to auto-size its iframe so content never gets clipped.
+  // Harmless no-op inside Google Sites, which doesn't listen for this.
+  new ResizeObserver(() => {
+    window.parent.postMessage({ nsHeight: document.documentElement.scrollHeight }, '*');
+  }).observe(document.documentElement);
+</script>
+
+</body>
+</html>

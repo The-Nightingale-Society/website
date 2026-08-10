@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ns-plum: #3E2A45; --ns-parchment: #EDE0C8; --ns-rust: #CB9C6E;
+    --ns-sand: #D8C0A0; --ns-brown: #2A1E18;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Lora', serif; background: var(--ns-plum); color: var(--ns-parchment); }
+  section {
+    padding: 4.5rem 6vw;
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .join__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--ns-sand);
+  }
+  .join__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+    margin: 0.6rem 0 1.2rem;
+  }
+  .join__desc { line-height: 1.75; font-size: 1.02rem; margin: 0 0 2rem; }
+  .join__actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .join__btn {
+    font-family: 'Lora', serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1.5px solid var(--ns-sand);
+    color: var(--ns-parchment);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .join__btn:hover { transform: translateY(-2px); }
+  .join__btn--primary { background: var(--ns-rust); border-color: var(--ns-rust); }
+  .join__btn--primary:hover { background: #AC855E; }
+  .join__btn--ghost:hover { background: rgba(216,192,160,0.12); }
+  .join__contact {
+    border-top: 1px solid rgba(216,192,160,0.3);
+    padding-top: 1.75rem;
+    font-size: 0.95rem;
+  }
+  .join__contact a { color: var(--ns-sand); }
+  .join__social { margin-top: 0.75rem; display: flex; justify-content: center; gap: 1rem; font-size: 0.9rem; }
+  .join__social a { color: var(--ns-parchment); text-decoration: none; border-bottom: 1px solid var(--ns-rust); }
+</style>
+</head>
+<body>
+
+<section>
+  <div class="join__kicker">Come Read With Us</div>
+  <h2 class="join__title">Join the Nightingale Society</h2>
+  <p class="join__desc">[Placeholder, a short, warm invitation: who the club is for, what membership involves, and any dues/commitment info.]</p>
+  <div class="join__actions">
+    <a class="join__btn join__btn--primary" href="mailto:[club@email.com]">Email Us to Join</a>
+    <a class="join__btn join__btn--ghost" href="[RSVP/signup form link]">RSVP to Next Meeting</a>
+  </div>
+  <div class="join__contact">
+    Questions? Reach us at <a href="mailto:[club@email.com]">[club@email.com]</a>
+    <div class="join__social">
+      <a href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Reports this page's real height to a parent window — used by the local
+  // preview.html to auto-size its iframe so content never gets clipped.
+  // Harmless no-op inside Google Sites, which doesn't listen for this.
+  new ResizeObserver(() => {
+    window.parent.postMessage({ nsHeight: document.documentElement.scrollHeight }, '*');
+  }).observe(document.documentElement);
+</script>
+
+</body>
+</html>

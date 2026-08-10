@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ns-plum: #3E2A45; --ns-parchment: #EDE0C8; --ns-rust: #CB9C6E;
+    --ns-sand: #D8C0A0; --ns-brown: #2A1E18;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Lora', serif; background: var(--ns-parchment); color: var(--ns-brown); }
+  section { padding: 4rem 6vw; }
+
+  .about__mission {
+    background: var(--ns-plum);
+    color: var(--ns-parchment);
+    text-align: center;
+    border-radius: 18px;
+  }
+  .about__kicker {
+    font-style: italic;
+    color: var(--ns-sand);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+  .about__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    margin: 0.6rem 0 1.2rem;
+  }
+  .about__mission p {
+    max-width: 60ch;
+    margin: 0 auto;
+    line-height: 1.75;
+    font-size: 1.05rem;
+  }
+
+  .leaders__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    text-align: center;
+    margin: 0 0 2.5rem;
+    color: var(--ns-plum);
+  }
+  /* Rows are built explicitly in JS (see distributeRows below) rather than
+     left to the browser's natural wrapping, so the row pattern (5, then
+     balanced remainders) stays exact regardless of viewport width. */
+  .leaders__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    max-width: 1450px;
+    margin: 0 auto;
+  }
+  .leaders__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+  .leader {
+    flex: 1 1 190px;
+    max-width: 230px;
+    background: #fff;
+    border: 1px solid rgba(62,42,69,0.12);
+    border-radius: 14px;
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(42,30,24,0.06);
+  }
+  .leader__photo {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: var(--ns-sand);
+    border: 2px solid var(--ns-rust);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--ns-plum);
+  }
+  .leader__photo img { width: 100%; height: 100%; object-fit: cover; }
+  .leader__name { font-weight: 600; font-size: 1.08rem; margin: 0 0 0.15rem; color: var(--ns-plum); }
+  .leader__role { color: var(--ns-rust); font-style: italic; font-size: 0.92rem; margin: 0 0 0.7rem; }
+  .leader__bio { font-size: 0.92rem; line-height: 1.55; margin: 0; }
+</style>
+</head>
+<body>
+
+<section class="about__mission">
+  <div class="about__kicker">Our Mission</div>
+  <h2 class="about__title">Why the Nightingale Society exists</h2>
+  <p>[Placeholder, replace with the club's mission statement: e.g. "We believe the best conversations happen after the last page. The Nightingale Society brings readers together each month to dig into a book, challenge each other's take on it, and leave with a longer to-be-read list than we started with."]</p>
+</section>
+
+<section>
+  <h2 class="leaders__title">The Team</h2>
+  <div class="leaders__grid" id="leadersGrid"></div>
+</section>
+
+<script>
+  // One object per team member. Add or remove entries freely — the layout
+  // centers however many there are, so there's no "right" number.
+  // photo: leave "" to show initials, or paste a photo URL — either a direct
+  // image link, or a Google Drive "share" link copied straight from Drive
+  // (Share → Copy link). See UPDATING-CONTENT.md for the full walkthrough.
+  const leaders = [
+    { name: "Julia Nance", role: "[Title Placeholder]", bio: "[Short bio placeholder: favorite genre, how long they've been with the club, one fun fact.]", photo: "" },
+    { name: "Lenny Hanisko", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "Sweetha Manikandan", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "Suhana Ramalingam", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "[Name]", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+  ];
+
+  function initials(name) {
+    return name.replace(/[\[\]]/g, '').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || "?";
+  }
+
+  function coverUrl(u) {
+    if (!u) return "";
+    const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
+    return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : u;
+  }
+
+  // Row sizes, max 5 per row: fill a row of 5 when there's enough left to be
+  // worth it; otherwise split the tail evenly across two rows so there's
+  // never a lonely row of 1–2. e.g. 6→[3,3], 7→[4,3], 8→[5,3], 11→[5,3,3].
+  function distributeRows(n) {
+    if (n <= 0) return [];
+    if (n <= 5) return [n];
+    if (n <= 7) {
+      const a = Math.ceil(n / 2);
+      return [a, n - a];
+    }
+    return [5, ...distributeRows(n - 5)];
+  }
+
+  function cardHtml(p) {
+    return `
+      <div class="leader">
+        <div class="leader__photo">${p.photo ? `<img src="${coverUrl(p.photo)}" alt="${p.name}">` : initials(p.name)}</div>
+        <p class="leader__name">${p.name}</p>
+        <p class="leader__role">${p.role}</p>
+        <p class="leader__bio">${p.bio}</p>
+      </div>
+    `;
+  }
+
+  let cursor = 0;
+  document.getElementById('leadersGrid').innerHTML = distributeRows(leaders.length).map(size => {
+    const row = leaders.slice(cursor, cursor + size);
+    cursor += size;
+    return `<div class="leaders__row">${row.map(cardHtml).join('')}</div>`;
+  }).join('');
+</script>
+
+<script>
+  // Reports this page's real height to a parent window — used by the local
+  // preview.html to auto-size its iframe so content never gets clipped.
+  // Harmless no-op inside Google Sites, which doesn't listen for this.
+  new ResizeObserver(() => {
+    window.parent.postMessage({ nsHeight: document.documentElement.scrollHeight }, '*');
+  }).observe(document.documentElement);
+</script>
+
+</body>
+</html>

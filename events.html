@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Events — The Nightingale Society</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ns-plum: #3E2A45; --ns-parchment: #EDE0C8; --ns-rust: #CB9C6E;
+    --ns-sand: #D8C0A0; --ns-brown: #2A1E18;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Lora', serif; background: var(--ns-parchment); color: var(--ns-brown); }
+  section { padding: 4rem 6vw; }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    color: var(--ns-plum);
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    margin: 0 0 2.5rem;
+  }
+
+  .site-nav {
+    background: var(--ns-plum);
+    border-bottom: 1px solid rgba(216,192,160,0.25);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .site-nav__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.9rem 6vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .site-nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ns-parchment);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .site-nav__brand img { width: 32px; height: 32px; object-fit: contain; }
+  .site-nav__links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+  .site-nav__link {
+    font-family: 'Lora', serif;
+    font-size: 0.92rem;
+    color: var(--ns-sand);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .site-nav__link:hover { color: var(--ns-parchment); }
+  .site-nav__link.is-active { color: var(--ns-parchment); border-color: var(--ns-rust); }
+
+  .site-footer {
+    background: var(--ns-plum);
+    color: var(--ns-sand);
+    text-align: center;
+    padding: 1.5rem 6vw;
+    font-size: 0.85rem;
+  }
+  .site-footer a { color: var(--ns-parchment); text-decoration: none; border-bottom: 1px solid var(--ns-rust); }
+
+  .events__list {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .event {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid rgba(62,42,69,0.12);
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(42,30,24,0.06);
+  }
+  .event__date {
+    flex-shrink: 0;
+    width: 72px;
+    text-align: center;
+    background: var(--ns-plum);
+    color: var(--ns-parchment);
+    border-radius: 10px;
+    padding: 0.6rem 0.4rem;
+  }
+  .event__date .month { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ns-sand); }
+  .event__date .day { display: block; font-family: 'Playfair Display', serif; font-size: 1.5rem; line-height: 1.1; }
+  .event__body { flex: 1; }
+  .event__title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0 0 0.3rem; color: var(--ns-plum); }
+  .event__meta { font-size: 0.85rem; color: var(--ns-rust); font-style: italic; margin: 0 0 0.5rem; }
+  .event__desc { font-size: 0.95rem; line-height: 1.6; margin: 0; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a class="site-nav__brand" href="index.html">
+      <img src="assets/nightingale-logo-transparent.png" alt="">
+      The Nightingale Society
+    </a>
+    <div class="site-nav__links">
+      <a href="index.html" class="site-nav__link">Home</a>
+      <a href="about.html" class="site-nav__link">About</a>
+      <a href="reads.html" class="site-nav__link">Reads</a>
+      <a href="events.html" class="site-nav__link is-active">Events</a>
+      <a href="writing.html" class="site-nav__link">Writing</a>
+      <a href="join.html" class="site-nav__link">Join</a>
+    </div>
+  </div>
+</nav>
+
+<section>
+  <h2>Upcoming Events</h2>
+  <div class="events__list" id="eventsList"></div>
+</section>
+
+<footer class="site-footer">
+  <p>&copy; <span id="nsYear"></span> The Nightingale Society &middot; <a href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a></p>
+</footer>
+
+<script>
+  document.getElementById('nsYear').textContent = new Date().getFullYear();
+
+  // One object per event, soonest first. Add or remove entries freely.
+  const events = [
+    { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Monthly Discussion]", meta: "[Time] · [In-person location or Virtual link]", desc: "[Placeholder description of the event: what to expect, what to bring, RSVP details.]" },
+    { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Writing Competition Kickoff]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
+    { month: "[Mon]", day: "[DD]", title: "[Event Title]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
+  ];
+
+  document.getElementById('eventsList').innerHTML = events.map(e => `
+    <div class="event">
+      <div class="event__date"><span class="month">${e.month}</span><span class="day">${e.day}</span></div>
+      <div class="event__body">
+        <h3 class="event__title">${e.title}</h3>
+        <p class="event__meta">${e.meta}</p>
+        <p class="event__desc">${e.desc}</p>
+      </div>
+    </div>
+  `).join('');
+</script>
+
+</body>
+</html>

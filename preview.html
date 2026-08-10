@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Nightingale Society — Local Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #3E2A45; }
+  iframe { display: block; width: 100%; border: 0; }
+  .note {
+    font: 13px/1.4 -apple-system, sans-serif;
+    background: #111;
+    color: #eee;
+    padding: 6px 14px;
+    text-align: center;
+  }
+  .note a { color: #D8C0A0; }
+</style>
+</head>
+<body>
+<div class="note">Legacy preview for the embeds/ folder (old Google Sites paste-in versions) only — the live site is now index.html, about.html, reads.html, events.html, writing.html, and join.html at the repo root; just open one directly or click through the nav.</div>
+<iframe data-src="embeds/home-hero.html" height="620" scrolling="no"></iframe>
+<iframe data-src="embeds/about-mission-leaders.html" height="1000" scrolling="no"></iframe>
+<iframe data-src="embeds/reads-current-past.html" height="1000" scrolling="no"></iframe>
+<iframe data-src="embeds/events.html" height="700" scrolling="no"></iframe>
+<iframe data-src="embeds/writing-competition-essays.html" height="900" scrolling="no"></iframe>
+<iframe data-src="embeds/join-contact.html" height="560" scrolling="no"></iframe>
+<script>
+  // Browsers cache iframe subresources fairly aggressively, and a plain
+  // refresh doesn't always bust that — so a normal reload could keep
+  // showing an old version of an embed after it's been edited. Appending a
+  // fresh cache-busting query string on every load guarantees each embed is
+  // always re-fetched.
+  const v = Date.now();
+  for (const frame of document.querySelectorAll('iframe[data-src]')) {
+    frame.src = frame.dataset.src + '?v=' + v;
+  }
+
+  // Each embed reports its real content height via postMessage (see the
+  // ResizeObserver snippet near the end of every embeds/*.html). Auto-sizing
+  // the matching iframe here means a section can never get clipped again,
+  // no matter how its content grows (e.g. more team members, more events).
+  window.addEventListener('message', (e) => {
+    if (typeof e.data?.nsHeight !== 'number') return;
+    for (const frame of document.querySelectorAll('iframe')) {
+      if (frame.contentWindow === e.source) {
+        frame.style.height = Math.ceil(e.data.nsHeight) + 'px';
+        break;
+      }
+    }
+  });
+</script>
+</body>
+</html>

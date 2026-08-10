@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ns-plum: #3E2A45; --ns-parchment: #EDE0C8; --ns-rust: #CB9C6E;
+    --ns-sand: #D8C0A0; --ns-brown: #2A1E18;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Lora', serif; background: var(--ns-parchment); color: var(--ns-brown); }
+  section { padding: 4rem 6vw; }
+
+  .comp {
+    max-width: 760px;
+    margin: 0 auto 3.5rem;
+    text-align: center;
+  }
+  .comp__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--ns-rust);
+  }
+  .comp__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    color: var(--ns-plum);
+    margin: 0.5rem 0 1rem;
+  }
+  .comp__desc { line-height: 1.7; font-size: 1.02rem; margin: 0 0 1.75rem; }
+  .comp__facts {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(62,42,69,0.18);
+    border-bottom: 1px solid rgba(62,42,69,0.18);
+    padding: 1.25rem 0;
+  }
+  .comp__fact { text-align: center; }
+  .comp__fact .label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ns-rust); margin-bottom: 0.25rem; }
+  .comp__fact .value { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--ns-plum); }
+
+  h2.essays__title {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    color: var(--ns-plum);
+    font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+    margin: 0 0 0.5rem;
+  }
+  .essays__subtitle {
+    text-align: center;
+    max-width: 60ch;
+    margin: 0 auto 2.5rem;
+    font-size: 0.95rem;
+    color: var(--ns-brown);
+    opacity: 0.85;
+  }
+  #essaysGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .essay-card {
+    background: #fff;
+    border: 1px solid rgba(62,42,69,0.12);
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(42,30,24,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .essay-card__status {
+    align-self: flex-start;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.9rem;
+  }
+  .essay-card__status--pending { background: var(--ns-sand); color: var(--ns-brown); }
+  .essay-card__status--published { background: var(--ns-rust); color: var(--ns-parchment); }
+  .essay-card__title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 0 0 0.25rem; color: var(--ns-plum); }
+  .essay-card__author { font-style: italic; color: var(--ns-rust); font-size: 0.88rem; margin: 0 0 0.75rem; }
+  .essay-card__blurb { font-size: 0.92rem; line-height: 1.55; margin: 0 0 1rem; flex: 1; }
+  .essay-card__link {
+    align-self: flex-start;
+    font-size: 0.88rem;
+    color: var(--ns-plum);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--ns-rust);
+    padding-bottom: 1px;
+  }
+  .essay-card__link[aria-disabled="true"] { color: #9a8f85; border-color: #cfc4b8; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<section>
+  <div class="comp">
+    <div class="comp__kicker">Now Accepting Entries</div>
+    <h1 class="comp__title">[Year] Writing Competition</h1>
+    <p class="comp__desc">[Placeholder, describe the competition: theme, who can enter, word count, judging criteria, and how winners are chosen.]</p>
+    <div class="comp__facts">
+      <div class="comp__fact"><span class="label">Theme</span><span class="value">[Theme]</span></div>
+      <div class="comp__fact"><span class="label">Deadline</span><span class="value">[Date]</span></div>
+      <div class="comp__fact"><span class="label">Prize</span><span class="value">[Prize]</span></div>
+      <div class="comp__fact"><span class="label">Submit To</span><span class="value">[Email]</span></div>
+    </div>
+  </div>
+
+  <h2 class="essays__title">Submitted Essays</h2>
+  <p class="essays__subtitle">Entries will appear here as judging wraps up. Check back soon to read what fellow members wrote.</p>
+  <div id="essaysGrid"></div>
+</section>
+
+<script>
+  // Add one object per essay. Until an essay is ready, leave link empty and
+  // status: "pending" — the card will render as "Coming Soon". Once it's
+  // ready to publish, set status: "published" and fill in the link (a URL
+  // to a Google Doc, PDF, or a new Sites page with the full essay).
+  const essays = [
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+  ];
+
+  const grid = document.getElementById('essaysGrid');
+  grid.innerHTML = essays.map(e => `
+    <div class="essay-card">
+      <span class="essay-card__status essay-card__status--${e.status === 'published' ? 'published' : 'pending'}">
+        ${e.status === 'published' ? 'Published' : 'Coming Soon'}
+      </span>
+      <h3 class="essay-card__title">${e.title}</h3>
+      <p class="essay-card__author">by ${e.author}</p>
+      <p class="essay-card__blurb">${e.blurb}</p>
+      ${e.status === 'published' && e.link
+        ? `<a class="essay-card__link" href="${e.link}" target="_blank" rel="noopener">Read the essay &rarr;</a>`
+        : `<span class="essay-card__link" aria-disabled="true">Read the essay &rarr;</span>`}
+    </div>
+  `).join('');
+</script>
+
+<script>
+  // Reports this page's real height to a parent window — used by the local
+  // preview.html to auto-size its iframe so content never gets clipped.
+  // Harmless no-op inside Google Sites, which doesn't listen for this.
+  new ResizeObserver(() => {
+    window.parent.postMessage({ nsHeight: document.documentElement.scrollHeight }, '*');
+  }).observe(document.documentElement);
+</script>
+
+</body>
+</html>
