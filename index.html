@@ -16,13 +16,24 @@
     --ns-brown: #2A1E18;
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: 'Lora', serif;
-    background: var(--ns-plum);
-    color: var(--ns-parchment);
+    background: var(--ns-parchment);
+    color: var(--ns-brown);
+  }
+  section[id] { scroll-margin-top: 84px; }
+  section { padding: 4rem 6vw; }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    color: var(--ns-plum);
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    margin: 0 0 2.5rem;
   }
 
+  /* ---- Nav + footer ---- */
   .site-nav {
     background: var(--ns-plum);
     border-bottom: 1px solid rgba(216,192,160,0.25);
@@ -74,11 +85,13 @@
   }
   .site-footer a { color: var(--ns-parchment); text-decoration: none; border-bottom: 1px solid var(--ns-rust); }
 
+  /* ---- Hero (Home) ---- */
   .hero {
     position: relative;
     min-height: 560px;
     overflow: hidden;
     background: radial-gradient(120% 140% at 15% 20%, var(--ns-plum) 0%, var(--ns-plum-dark) 100%);
+    color: var(--ns-parchment);
     display: flex;
     align-items: center;
     padding: 4rem 5vw;
@@ -120,10 +133,7 @@
     transform: translateY(14px);
     transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
   }
-  .hero__title em {
-    color: var(--ns-rust);
-    font-style: normal;
-  }
+  .hero__title em { color: var(--ns-rust); font-style: normal; }
   .hero__subtitle {
     font-size: 1.08rem;
     line-height: 1.6;
@@ -156,9 +166,6 @@
   .hero__btn--ghost { border-color: var(--ns-sand); color: var(--ns-parchment); }
   .hero__btn--ghost:hover { background: rgba(216,192,160,0.12); }
 
-  /* Sits in the remaining space to the right of hero__content, so the badge
-     lands centered between the end of the text and the hero's right edge
-     regardless of viewport width. */
   .hero__logo-slot {
     position: relative;
     z-index: 1;
@@ -187,36 +194,185 @@
   @media (prefers-reduced-motion: reduce) {
     .hero__canvas { opacity: 0.6; }
   }
+
+  /* ---- About ---- */
+  .about__mission {
+    background: var(--ns-plum);
+    color: var(--ns-parchment);
+    text-align: center;
+    border-radius: 18px;
+    padding: 2.5rem 2rem;
+    margin: 0 0 3.5rem;
+  }
+  .about__kicker {
+    font-style: italic;
+    color: var(--ns-sand);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+  .about__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    margin: 0.6rem 0 1.2rem;
+  }
+  .about__mission p { max-width: 60ch; margin: 0 auto; line-height: 1.75; font-size: 1.05rem; }
+
+  .leaders__title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    text-align: center;
+    margin: 0 0 2.5rem;
+    color: var(--ns-plum);
+  }
+  .leaders__grid { display: flex; flex-direction: column; gap: 1.75rem; max-width: 1450px; margin: 0 auto; }
+  .leaders__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; }
+  .leader {
+    flex: 1 1 190px;
+    max-width: 230px;
+    background: #fff;
+    border: 1px solid rgba(62,42,69,0.12);
+    border-radius: 14px;
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(42,30,24,0.06);
+  }
+  .leader__photo {
+    width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 1rem;
+    background: var(--ns-sand); border: 2px solid var(--ns-rust);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--ns-plum);
+  }
+  .leader__photo img { width: 100%; height: 100%; object-fit: cover; }
+  .leader__name { font-weight: 600; font-size: 1.08rem; margin: 0 0 0.15rem; color: var(--ns-plum); }
+  .leader__role { color: var(--ns-rust); font-style: italic; font-size: 0.92rem; margin: 0 0 0.7rem; }
+  .leader__bio { font-size: 0.92rem; line-height: 1.55; margin: 0; }
+
+  /* ---- Reads ---- */
+  .current {
+    max-width: 820px; margin: 0 auto 4rem; background: var(--ns-plum); color: var(--ns-parchment);
+    border-radius: 18px; display: flex; gap: 2rem; align-items: center; padding: 2.25rem; flex-wrap: wrap;
+  }
+  .current__cover {
+    width: 130px; height: 190px; flex-shrink: 0; background: var(--ns-sand); border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
+    overflow: hidden; color: var(--ns-plum); font-family: 'Playfair Display', serif; font-size: 0.85rem;
+    text-align: center; padding: 0.5rem;
+  }
+  .current__cover img, .archive__cover img { width: 100%; height: 100%; object-fit: cover; }
+  .current__body { flex: 1; min-width: 220px; }
+  .current__kicker { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; color: var(--ns-sand); font-style: italic; }
+  .current__title { font-family: 'Playfair Display', serif; font-size: 1.55rem; margin: 0.4rem 0 0.1rem; }
+  .current__author { color: var(--ns-sand); margin: 0 0 0.9rem; font-style: italic; }
+  .current__synopsis { line-height: 1.65; font-size: 0.98rem; margin: 0 0 1rem; }
+  .current__date { display: inline-block; border: 1px solid var(--ns-sand); border-radius: 999px; padding: 0.35rem 0.9rem; font-size: 0.85rem; }
+
+  .archive__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .archive__item { text-align: center; }
+  .archive__cover {
+    width: 100%; aspect-ratio: 2 / 3; background: #fff; border: 1px solid rgba(62,42,69,0.15); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--ns-plum);
+    font-family: 'Playfair Display', serif; font-size: 0.8rem; padding: 0.6rem;
+    box-shadow: 0 4px 12px rgba(42,30,24,0.08); margin-bottom: 0.6rem;
+  }
+  .archive__title { font-weight: 600; font-size: 0.92rem; margin: 0; color: var(--ns-plum); }
+  .archive__meta { font-size: 0.8rem; color: var(--ns-rust); margin: 0.2rem 0 0; font-style: italic; }
+
+  /* ---- Events ---- */
+  .events__list { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+  .event {
+    display: flex; gap: 1.5rem; align-items: flex-start; background: #fff;
+    border: 1px solid rgba(62,42,69,0.12); border-radius: 14px; padding: 1.5rem; box-shadow: 0 4px 14px rgba(42,30,24,0.06);
+  }
+  .event__date { flex-shrink: 0; width: 72px; text-align: center; background: var(--ns-plum); color: var(--ns-parchment); border-radius: 10px; padding: 0.6rem 0.4rem; }
+  .event__date .month { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ns-sand); }
+  .event__date .day { display: block; font-family: 'Playfair Display', serif; font-size: 1.5rem; line-height: 1.1; }
+  .event__body { flex: 1; }
+  .event__title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0 0 0.3rem; color: var(--ns-plum); }
+  .event__meta { font-size: 0.85rem; color: var(--ns-rust); font-style: italic; margin: 0 0 0.5rem; }
+  .event__desc { font-size: 0.95rem; line-height: 1.6; margin: 0; }
+
+  /* ---- Writing ---- */
+  .comp { max-width: 760px; margin: 0 auto 3.5rem; text-align: center; }
+  .comp__kicker { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.78rem; font-style: italic; color: var(--ns-rust); }
+  .comp__title { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 3.6vw, 2.4rem); color: var(--ns-plum); margin: 0.5rem 0 1rem; }
+  .comp__desc { line-height: 1.7; font-size: 1.02rem; margin: 0 0 1.75rem; }
+  .comp__facts {
+    display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+    border-top: 1px solid rgba(62,42,69,0.18); border-bottom: 1px solid rgba(62,42,69,0.18); padding: 1.25rem 0;
+  }
+  .comp__fact { text-align: center; }
+  .comp__fact .label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ns-rust); margin-bottom: 0.25rem; }
+  .comp__fact .value { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--ns-plum); }
+
+  h2.essays__title { font-family: 'Playfair Display', serif; text-align: center; color: var(--ns-plum); font-size: clamp(1.4rem, 2.8vw, 1.9rem); margin: 0 0 0.5rem; }
+  .essays__subtitle { text-align: center; max-width: 60ch; margin: 0 auto 2.5rem; font-size: 0.95rem; color: var(--ns-brown); opacity: 0.85; }
+  #essaysGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .essay-card {
+    background: #fff; border: 1px solid rgba(62,42,69,0.12); border-radius: 14px; padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(42,30,24,0.06); display: flex; flex-direction: column;
+  }
+  .essay-card__status {
+    align-self: flex-start; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.25rem 0.7rem; border-radius: 999px; margin-bottom: 0.9rem;
+  }
+  .essay-card__status--pending { background: var(--ns-sand); color: var(--ns-brown); }
+  .essay-card__status--published { background: var(--ns-rust); color: var(--ns-parchment); }
+  .essay-card__title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 0 0 0.25rem; color: var(--ns-plum); }
+  .essay-card__author { font-style: italic; color: var(--ns-rust); font-size: 0.88rem; margin: 0 0 0.75rem; }
+  .essay-card__blurb { font-size: 0.92rem; line-height: 1.55; margin: 0 0 1rem; flex: 1; }
+  .essay-card__link { align-self: flex-start; font-size: 0.88rem; color: var(--ns-plum); text-decoration: none; border-bottom: 1.5px solid var(--ns-rust); padding-bottom: 1px; }
+  .essay-card__link[aria-disabled="true"] { color: #9a8f85; border-color: #cfc4b8; pointer-events: none; }
+
+  /* ---- Join ---- */
+  .join-section { background: var(--ns-plum); color: var(--ns-parchment); }
+  .join-inner { max-width: 640px; margin: 0 auto; text-align: center; }
+  .join__kicker { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.78rem; font-style: italic; color: var(--ns-sand); }
+  .join__title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.6vw, 2.5rem); margin: 0.6rem 0 1.2rem; }
+  .join__desc { line-height: 1.75; font-size: 1.02rem; margin: 0 0 2rem; }
+  .join__actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .join__btn {
+    font-family: 'Lora', serif; font-size: 0.95rem; padding: 0.75rem 1.6rem; border-radius: 999px; text-decoration: none;
+    border: 1.5px solid var(--ns-sand); color: var(--ns-parchment); transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .join__btn:hover { transform: translateY(-2px); }
+  .join__btn--primary { background: var(--ns-rust); border-color: var(--ns-rust); }
+  .join__btn--primary:hover { background: #AC855E; }
+  .join__btn--ghost:hover { background: rgba(216,192,160,0.12); }
+  .join__contact { border-top: 1px solid rgba(216,192,160,0.3); padding-top: 1.75rem; font-size: 0.95rem; }
+  .join__contact a { color: var(--ns-sand); }
+  .join__social { margin-top: 0.75rem; display: flex; justify-content: center; gap: 1rem; font-size: 0.9rem; }
+  .join__social a { color: var(--ns-parchment); text-decoration: none; border-bottom: 1px solid var(--ns-rust); }
 </style>
 </head>
 <body>
 
 <nav class="site-nav">
   <div class="site-nav__inner">
-    <a class="site-nav__brand" href="index.html">
+    <a class="site-nav__brand" href="#home">
       <img src="assets/nightingale-logo-transparent.png" alt="">
       The Nightingale Society
     </a>
     <div class="site-nav__links">
-      <a href="index.html" class="site-nav__link is-active">Home</a>
-      <a href="about.html" class="site-nav__link">About</a>
-      <a href="reads.html" class="site-nav__link">Reads</a>
-      <a href="events.html" class="site-nav__link">Events</a>
-      <a href="writing.html" class="site-nav__link">Writing</a>
-      <a href="join.html" class="site-nav__link">Join</a>
+      <a href="#home" class="site-nav__link">Home</a>
+      <a href="#about" class="site-nav__link">About</a>
+      <a href="#reads" class="site-nav__link">Reads</a>
+      <a href="#events" class="site-nav__link">Events</a>
+      <a href="#writing" class="site-nav__link">Writing</a>
+      <a href="#join" class="site-nav__link">Join</a>
     </div>
   </div>
 </nav>
 
-<section class="hero" id="nsHero">
+<section class="hero" id="home">
   <canvas class="hero__canvas" id="nsCanvas"></canvas>
   <div class="hero__content">
     <span class="hero__eyebrow">Est. by readers, for readers</span>
     <h1 class="hero__title">the <em>nightingale</em> society</h1>
     <p class="hero__subtitle">A book club for people who read past midnight. We gather monthly to talk about the books we can't stop thinking about. This year, we're reading each other's words too.</p>
     <div class="hero__ctas">
-      <a class="hero__btn hero__btn--primary" href="writing.html">Writing Competition</a>
-      <a class="hero__btn hero__btn--ghost" href="join.html">Join Us</a>
+      <a class="hero__btn hero__btn--primary" href="#writing">Writing Competition</a>
+      <a class="hero__btn hero__btn--ghost" href="#join">Join Us</a>
     </div>
   </div>
   <div class="hero__logo-slot">
@@ -224,9 +380,309 @@
   </div>
 </section>
 
+<section id="about">
+  <div class="about__mission">
+    <div class="about__kicker">Our Mission</div>
+    <h2 class="about__title">Why the Nightingale Society exists</h2>
+    <p>[Placeholder, replace with the club's mission statement: e.g. "We believe the best conversations happen after the last page. The Nightingale Society brings readers together each month to dig into a book, challenge each other's take on it, and leave with a longer to-be-read list than we started with."]</p>
+  </div>
+  <h2 class="leaders__title">The Team</h2>
+  <div class="leaders__grid" id="leadersGrid"></div>
+</section>
+
+<section id="reads">
+  <h2>Currently Reading</h2>
+  <div class="current" id="currentRead"></div>
+  <h2>Past Reads</h2>
+  <div class="archive__grid" id="archiveGrid"></div>
+</section>
+
+<section id="events">
+  <h2>Upcoming Events</h2>
+  <div class="events__list" id="eventsList"></div>
+</section>
+
+<section id="writing">
+  <div class="comp">
+    <div class="comp__kicker">Now Accepting Entries</div>
+    <h1 class="comp__title">[Year] Writing Competition</h1>
+    <p class="comp__desc">[Placeholder, describe the competition: theme, who can enter, word count, judging criteria, and how winners are chosen.]</p>
+    <div class="comp__facts">
+      <div class="comp__fact"><span class="label">Theme</span><span class="value">[Theme]</span></div>
+      <div class="comp__fact"><span class="label">Deadline</span><span class="value">[Date]</span></div>
+      <div class="comp__fact"><span class="label">Prize</span><span class="value">[Prize]</span></div>
+      <div class="comp__fact"><span class="label">Submit To</span><span class="value">[Email]</span></div>
+    </div>
+  </div>
+  <h2 class="essays__title">Submitted Essays</h2>
+  <p class="essays__subtitle">Entries will appear here as judging wraps up. Check back soon to read what fellow members wrote.</p>
+  <div id="essaysGrid"></div>
+</section>
+
+<section id="join" class="join-section">
+  <div class="join-inner">
+    <div class="join__kicker">Come Read With Us</div>
+    <h2 class="join__title">Join the Nightingale Society</h2>
+    <p class="join__desc">[Placeholder, a short, warm invitation: who the club is for, what membership involves, and any dues/commitment info.]</p>
+    <div class="join__actions">
+      <a class="join__btn join__btn--primary" href="mailto:[club@email.com]">Email Us to Join</a>
+      <a class="join__btn join__btn--ghost" href="[RSVP/signup form link]">RSVP to Next Meeting</a>
+    </div>
+    <div class="join__contact">
+      Questions? Reach us at <a href="mailto:[club@email.com]">[club@email.com]</a>
+      <div class="join__social">
+        <a href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer class="site-footer">
   <p>&copy; <span id="nsYear"></span> The Nightingale Society &middot; <a href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a></p>
 </footer>
+
+<script>
+  // ---- Shared: fetch the live Reads sheet once, for both the Reads
+  // section below and the hero's flying-book cover art. ----
+  const SHEET_ID = "1pULfn9fQH4S8YiucXL0LiDyVxicLmAZ95svPWh9MDDk";
+  const SHEET_TAB = "Reads";
+  const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
+  const FETCH_TIMEOUT_MS = 6000;
+
+  // Accepts a plain image URL, OR a Google Drive "share" link pasted
+  // straight from Drive's Share button — converts the Drive link into a
+  // direct-viewable image URL automatically so nobody has to hand-build one.
+  function coverUrl(u) {
+    if (!u) return "";
+    const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
+    return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : u;
+  }
+  window.NS_COVER_URL = coverUrl;
+
+  // Minimal RFC 4180 CSV parser — handles quoted fields, embedded commas,
+  // escaped quotes ("") and newlines inside quotes, which is what the
+  // Google Sheets CSV export produces.
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = "", inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(field); field = "";
+      } else if (c === '\r') {
+        // skip, \n below ends the row
+      } else if (c === '\n') {
+        row.push(field); field = "";
+        rows.push(row); row = [];
+      } else {
+        field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== ""));
+  }
+
+  function rowsToReads(csvText) {
+    const rows = parseCSV(csvText);
+    const [header, ...body] = rows;
+    const idx = name => header.findIndex(h => h.trim().toLowerCase() === name);
+    const iStatus = idx("status"), iTitle = idx("title"), iAuthor = idx("author"),
+          iSynopsis = idx("synopsis"), iDate = idx("discussion date / month"), iCover = idx("cover");
+
+    let current = null;
+    const pastReads = [];
+    for (const r of body) {
+      const status = (r[iStatus] || "").trim().toLowerCase();
+      const entry = {
+        title: r[iTitle] || "",
+        author: r[iAuthor] || "",
+        synopsis: r[iSynopsis] || "",
+        date: r[iDate] || "",
+        month: r[iDate] || "",
+        cover: r[iCover] || "",
+      };
+      if (status === "current" && !current) current = entry;
+      else if (status === "past") pastReads.push(entry);
+    }
+    if (!current) throw new Error("No row with Status = Current found in sheet");
+    return { current, pastReads };
+  }
+
+  function fetchReadsSheet() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    return fetch(SHEET_CSV_URL, { signal: controller.signal, cache: "no-store" })
+      .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
+      .then(csvText => rowsToReads(csvText))
+      .finally(() => clearTimeout(timeout));
+  }
+
+  // Single shared fetch — both consumers below attach to this same promise
+  // instead of hitting the sheet twice.
+  window.NS_READS_PROMISE = fetchReadsSheet();
+</script>
+
+<script>
+  document.getElementById('nsYear').textContent = new Date().getFullYear();
+
+  // ---- Currently Reading / Past Reads (live from the sheet above) ----
+  const FALLBACK_CURRENT = {
+    title: "Project Hail Mary",
+    author: "Andy Weir",
+    synopsis: "A lone astronaut wakes up on a solitary space mission with no memory of how he got there, or that the fate of humanity rests on whether he can solve the problem he was sent to fix.",
+    date: "[Date]",
+    cover: "assets/covers/project-hail-mary.png",
+  };
+  const FALLBACK_PAST_READS = [
+    { title: "Murder on the Orient Express", author: "Agatha Christie", month: "July 2026", cover: "assets/covers/murder-orient-express.png" },
+  ];
+
+  function renderCurrent(currentRead) {
+    document.getElementById('currentRead').innerHTML = `
+      <div class="current__cover">${currentRead.cover ? `<img src="${coverUrl(currentRead.cover)}" alt="${currentRead.title} cover">` : `${currentRead.title}`}</div>
+      <div class="current__body">
+        <div class="current__kicker">This Month's Pick</div>
+        <h3 class="current__title">${currentRead.title}</h3>
+        <p class="current__author">by ${currentRead.author}</p>
+        <p class="current__synopsis">${currentRead.synopsis}</p>
+        <span class="current__date">Discussion: ${currentRead.date}</span>
+      </div>
+    `;
+  }
+
+  function renderPastReads(pastReads) {
+    document.getElementById('archiveGrid').innerHTML = pastReads.map(b => `
+      <div class="archive__item">
+        <div class="archive__cover">${b.cover ? `<img src="${coverUrl(b.cover)}" alt="${b.title} cover">` : b.title}</div>
+        <p class="archive__title">${b.title}</p>
+        <p class="archive__meta">${b.month}</p>
+      </div>
+    `).join('');
+  }
+
+  function renderReads(currentRead, pastReads) {
+    renderCurrent(currentRead);
+    renderPastReads(pastReads);
+  }
+
+  renderReads(FALLBACK_CURRENT, FALLBACK_PAST_READS);
+  window.NS_READS_PROMISE
+    .then(({ current, pastReads }) => renderReads(current, pastReads))
+    .catch(err => console.warn("Nightingale: couldn't load live Reads sheet, showing fallback content.", err));
+
+  // ---- The Team ----
+  // photo: leave "" to show initials, or paste a photo URL — either a direct
+  // image link, or a Google Drive "share" link copied straight from Drive
+  // (Share → Copy link). See UPDATING-CONTENT.md for the full walkthrough.
+  const leaders = [
+    { name: "Julia Nance", role: "[Title Placeholder]", bio: "[Short bio placeholder: favorite genre, how long they've been with the club, one fun fact.]", photo: "" },
+    { name: "Lenny Hanisko", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "Sweetha Manikandan", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "Suhana Ramalingam", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+    { name: "[Name]", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
+  ];
+
+  function initials(name) {
+    return name.replace(/[\[\]]/g, '').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || "?";
+  }
+
+  // Row sizes, max 5 per row: fill a row of 5 when there's enough left to be
+  // worth it; otherwise split the tail evenly across two rows so there's
+  // never a lonely row of 1–2. e.g. 6→[3,3], 7→[4,3], 8→[5,3], 11→[5,3,3].
+  function distributeRows(n) {
+    if (n <= 0) return [];
+    if (n <= 5) return [n];
+    if (n <= 7) {
+      const a = Math.ceil(n / 2);
+      return [a, n - a];
+    }
+    return [5, ...distributeRows(n - 5)];
+  }
+
+  function leaderCardHtml(p) {
+    return `
+      <div class="leader">
+        <div class="leader__photo">${p.photo ? `<img src="${coverUrl(p.photo)}" alt="${p.name}">` : initials(p.name)}</div>
+        <p class="leader__name">${p.name}</p>
+        <p class="leader__role">${p.role}</p>
+        <p class="leader__bio">${p.bio}</p>
+      </div>
+    `;
+  }
+
+  let leaderCursor = 0;
+  document.getElementById('leadersGrid').innerHTML = distributeRows(leaders.length).map(size => {
+    const row = leaders.slice(leaderCursor, leaderCursor + size);
+    leaderCursor += size;
+    return `<div class="leaders__row">${row.map(leaderCardHtml).join('')}</div>`;
+  }).join('');
+
+  // ---- Upcoming Events ----
+  // One object per event, soonest first. Add or remove entries freely.
+  const events = [
+    { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Monthly Discussion]", meta: "[Time] · [In-person location or Virtual link]", desc: "[Placeholder description of the event: what to expect, what to bring, RSVP details.]" },
+    { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Writing Competition Kickoff]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
+    { month: "[Mon]", day: "[DD]", title: "[Event Title]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
+  ];
+
+  document.getElementById('eventsList').innerHTML = events.map(e => `
+    <div class="event">
+      <div class="event__date"><span class="month">${e.month}</span><span class="day">${e.day}</span></div>
+      <div class="event__body">
+        <h3 class="event__title">${e.title}</h3>
+        <p class="event__meta">${e.meta}</p>
+        <p class="event__desc">${e.desc}</p>
+      </div>
+    </div>
+  `).join('');
+
+  // ---- Writing Competition Essays ----
+  // Add one object per essay. Until an essay is ready, leave link empty and
+  // status: "pending" — the card will render as "Coming Soon". Once it's
+  // ready to publish, set status: "published" and fill in the link.
+  const essays = [
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+    { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
+  ];
+
+  document.getElementById('essaysGrid').innerHTML = essays.map(e => `
+    <div class="essay-card">
+      <span class="essay-card__status essay-card__status--${e.status === 'published' ? 'published' : 'pending'}">
+        ${e.status === 'published' ? 'Published' : 'Coming Soon'}
+      </span>
+      <h3 class="essay-card__title">${e.title}</h3>
+      <p class="essay-card__author">by ${e.author}</p>
+      <p class="essay-card__blurb">${e.blurb}</p>
+      ${e.status === 'published' && e.link
+        ? `<a class="essay-card__link" href="${e.link}" target="_blank" rel="noopener">Read the essay &rarr;</a>`
+        : `<span class="essay-card__link" aria-disabled="true">Read the essay &rarr;</span>`}
+    </div>
+  `).join('');
+
+  // ---- Nav scroll-spy: highlight whichever section is currently in view ----
+  const navLinks = [...document.querySelectorAll('.site-nav__link')];
+  const spySections = navLinks
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = '#' + entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === id));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  spySections.forEach(s => spy.observe(s));
+</script>
 
 <script type="importmap">
 { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
@@ -234,7 +690,7 @@
 <script type="module">
 import * as THREE from "three";
 
-const heroEl = document.getElementById('nsHero');
+const heroEl = document.getElementById('home');
 const canvas = document.getElementById('nsCanvas');
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -457,21 +913,20 @@ try {
   const BOOK_COLORS = [RUST, SAND, PARCHMENT, RUST_LIGHT, BROWN, PLUM_LIGHT, GOLD, RUST_DARK];
   const SPARKLE_TINTS = [0xFFF6E0, PARCHMENT, SAND, GOLD];
 
-  // A few of the flying books show a real cover instead of a flat color —
-  // update this list whenever the current/past reads change (see
-  // reads.html and UPDATING-CONTENT.md). Accepts a direct image URL or a
-  // Google Drive "share" link.
-  function coverUrl(u) {
-    if (!u) return "";
-    const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
-    return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : u;
-  }
-  const COVER_URLS = [
-    "assets/covers/project-hail-mary.png",
-    "assets/covers/murder-orient-express.png",
-  ].map(coverUrl);
+  // A few of the flying books show a real cover instead of a flat color.
+  // Starts with these two local covers, then swaps in every cover from the
+  // live Reads sheet (current + past) once that fetch resolves — see
+  // window.NS_READS_PROMISE above.
+  const FALLBACK_COVER_PATHS = ["assets/covers/project-hail-mary.png", "assets/covers/murder-orient-express.png"];
   const textureLoader = new THREE.TextureLoader();
-  const bookCoverTextures = COVER_URLS.map(url => textureLoader.load(url));
+  let bookCoverTextures = FALLBACK_COVER_PATHS.map(u => textureLoader.load(window.NS_COVER_URL(u)));
+
+  window.NS_READS_PROMISE.then(({ current, pastReads }) => {
+    const covers = Array.from(new Set([current, ...pastReads].map(b => b.cover).filter(Boolean)));
+    if (covers.length) {
+      bookCoverTextures = covers.map(u => textureLoader.load(window.NS_COVER_URL(u)));
+    }
+  }).catch(() => {});
 
   function resize() {
     const rect = heroEl.getBoundingClientRect();
@@ -655,10 +1110,6 @@ try {
 }
 
 requestAnimationFrame(() => heroEl.classList.add('is-ready'));
-</script>
-
-<script>
-  document.getElementById('nsYear').textContent = new Date().getFullYear();
 </script>
 
 </body>
