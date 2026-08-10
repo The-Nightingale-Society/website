@@ -167,7 +167,7 @@
 <section class="about__mission">
   <div class="about__kicker">Our Mission</div>
   <h2 class="about__title">Why the Nightingale Society exists</h2>
-  <p>[Placeholder, replace with the club's mission statement: e.g. "We believe the best conversations happen after the last page. The Nightingale Society brings readers together each month to dig into a book, challenge each other's take on it, and leave with a longer to-be-read list than we started with."]</p>
+  <p id="missionText">[Placeholder, replace with the club's mission statement: e.g. "We believe the best conversations happen after the last page. The Nightingale Society brings readers together each month to dig into a book, challenge each other's take on it, and leave with a longer to-be-read list than we started with."]</p>
 </section>
 
 <section>
@@ -182,12 +182,86 @@
 <script>
   document.getElementById('nsYear').textContent = new Date().getFullYear();
 
-  // One object per team member. Add or remove entries freely — the layout
-  // centers however many there are, so there's no "right" number.
-  // photo: leave "" to show initials, or paste a photo URL — either a direct
-  // image link, or a Google Drive "share" link copied straight from Drive
-  // (Share → Copy link). See UPDATING-CONTENT.md for the full walkthrough.
-  const leaders = [
+  // ---- Live source: Google Sheet ("About" + "Team" tabs) ----
+  const SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
+  const FETCH_TIMEOUT_MS = 6000;
+
+  function sheetCsvUrl(tab) {
+    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
+  }
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = "", inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(field); field = "";
+      } else if (c === '\r') {
+        // skip, \n below ends the row
+      } else if (c === '\n') {
+        row.push(field); field = "";
+        rows.push(row); row = [];
+      } else {
+        field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== ""));
+  }
+
+  function fetchCsv(tab) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    return fetch(sheetCsvUrl(tab), { signal: controller.signal, cache: "no-store" })
+      .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
+      .finally(() => clearTimeout(timeout));
+  }
+
+  // "Field / Value" tab → { field (lowercased): value }
+  function rowsToFieldMap(csvText) {
+    const [, ...body] = parseCSV(csvText);
+    const map = {};
+    for (const r of body) {
+      if (r[0]) map[r[0].trim().toLowerCase()] = (r[1] || "").trim();
+    }
+    return map;
+  }
+
+  function rowsToLeaders(csvText) {
+    const rows = parseCSV(csvText);
+    const [header, ...body] = rows;
+    const idx = name => header.findIndex(h => h.trim().toLowerCase() === name);
+    const iName = idx("name"), iRole = idx("role"), iBio = idx("bio"), iPhoto = idx("photo");
+    return body.map(r => ({
+      name: (r[iName] || "").trim(),
+      role: (r[iRole] || "").trim(),
+      bio: (r[iBio] || "").trim(),
+      photo: (r[iPhoto] || "").trim(),
+    }));
+  }
+
+  fetchCsv("About")
+    .then(csvText => {
+      const fields = rowsToFieldMap(csvText);
+      if (fields.mission) document.getElementById('missionText').textContent = fields.mission;
+    })
+    .catch(err => console.warn("Nightingale: couldn't load live About sheet, showing fallback content.", err));
+
+  // One object per team member. Used only if the live sheet can't be
+  // reached. photo: leave "" to show initials, or paste a photo URL —
+  // either a direct image link, or a Google Drive "share" link copied
+  // straight from Drive (Share → Copy link).
+  const FALLBACK_LEADERS = [
     { name: "Julia Nance", role: "[Title Placeholder]", bio: "[Short bio placeholder: favorite genre, how long they've been with the club, one fun fact.]", photo: "" },
     { name: "Lenny Hanisko", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
     { name: "Sweetha Manikandan", role: "[Title Placeholder]", bio: "[Short bio placeholder.]", photo: "" },
@@ -229,12 +303,23 @@
     `;
   }
 
-  let cursor = 0;
-  document.getElementById('leadersGrid').innerHTML = distributeRows(leaders.length).map(size => {
-    const row = leaders.slice(cursor, cursor + size);
-    cursor += size;
-    return `<div class="leaders__row">${row.map(cardHtml).join('')}</div>`;
-  }).join('');
+  function renderLeaders(leaders) {
+    let cursor = 0;
+    document.getElementById('leadersGrid').innerHTML = distributeRows(leaders.length).map(size => {
+      const row = leaders.slice(cursor, cursor + size);
+      cursor += size;
+      return `<div class="leaders__row">${row.map(cardHtml).join('')}</div>`;
+    }).join('');
+  }
+
+  renderLeaders(FALLBACK_LEADERS);
+
+  fetchCsv("Team")
+    .then(csvText => {
+      const leaders = rowsToLeaders(csvText);
+      if (leaders.length) renderLeaders(leaders);
+    })
+    .catch(err => console.warn("Nightingale: couldn't load live Team sheet, showing fallback content.", err));
 </script>
 
 </body>

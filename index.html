@@ -457,21 +457,77 @@ try {
   const BOOK_COLORS = [RUST, SAND, PARCHMENT, RUST_LIGHT, BROWN, PLUM_LIGHT, GOLD, RUST_DARK];
   const SPARKLE_TINTS = [0xFFF6E0, PARCHMENT, SAND, GOLD];
 
-  // A few of the flying books show a real cover instead of a flat color —
-  // update this list whenever the current/past reads change (see
-  // reads.html and UPDATING-CONTENT.md). Accepts a direct image URL or a
-  // Google Drive "share" link.
+  // A few of the flying books show a real cover instead of a flat color.
+  // Accepts a direct image URL or a Google Drive "share" link.
   function coverUrl(u) {
     if (!u) return "";
     const m = u.match(/\/file\/d\/([^/]+)/) || u.match(/[?&]id=([^&]+)/);
     return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : u;
   }
-  const COVER_URLS = [
+  const textureLoader = new THREE.TextureLoader();
+
+  // Used only if the live sheet can't be reached.
+  const FALLBACK_COVER_URLS = [
     "assets/covers/project-hail-mary.png",
     "assets/covers/murder-orient-express.png",
-  ].map(coverUrl);
-  const textureLoader = new THREE.TextureLoader();
-  const bookCoverTextures = COVER_URLS.map(url => textureLoader.load(url));
+  ];
+  // `let` (not `const`) so spawnFlight — which reads this by name each time
+  // it runs — automatically picks up the live sheet's covers once they
+  // arrive, without needing to restart the animation.
+  let bookCoverTextures = FALLBACK_COVER_URLS.map(coverUrl).map(url => textureLoader.load(url));
+
+  // Reuses the same "Reads" sheet tab that powers reads.html, so the hero
+  // automatically shows whatever the club is currently/previously reading
+  // instead of needing a second place to keep in sync.
+  const READS_SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
+  const READS_CSV_URL = `https://docs.google.com/spreadsheets/d/${READS_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Reads`;
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = "", inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(field); field = "";
+      } else if (c === '\r') {
+        // skip, \n below ends the row
+      } else if (c === '\n') {
+        row.push(field); field = "";
+        rows.push(row); row = [];
+      } else {
+        field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== ""));
+  }
+
+  const readsController = new AbortController();
+  const readsTimeout = setTimeout(() => readsController.abort(), 6000);
+  fetch(READS_CSV_URL, { signal: readsController.signal, cache: "no-store" })
+    .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
+    .then(csvText => {
+      const rows = parseCSV(csvText);
+      const [header, ...body] = rows;
+      const iCover = header.findIndex(h => h.trim().toLowerCase() === "cover");
+      const covers = body.map(r => (r[iCover] || "").trim()).filter(Boolean).map(coverUrl);
+      if (covers.length) {
+        bookCoverTextures = covers.map(url => textureLoader.load(url));
+      }
+    })
+    .catch(err => {
+      console.warn("Nightingale: couldn't load live Reads sheet for hero covers, using fallback.", err);
+    })
+    .finally(() => clearTimeout(readsTimeout));
 
   function resize() {
     const rect = heroEl.getBoundingClientRect();
