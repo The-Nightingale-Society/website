@@ -192,7 +192,7 @@
   // "Anyone with the link — Viewer" or the fetch below will fail (silently
   // falling back to FALLBACK_* below). See the sheet's "Read Me" tab for
   // the editing format.
-  const SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
+  const SHEET_ID = "1pULfn9fQH4S8YiucXL0LiDyVxicLmAZ95svPWh9MDDk";
   const SHEET_TAB = "Reads";
   const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
   const FETCH_TIMEOUT_MS = 6000;
@@ -263,12 +263,12 @@
     for (const r of body) {
       const status = (r[iStatus] || "").trim().toLowerCase();
       const entry = {
-        title: (r[iTitle] || "").trim(),
-        author: (r[iAuthor] || "").trim(),
-        synopsis: (r[iSynopsis] || "").trim(),
-        date: (r[iDate] || "").trim(),
-        month: (r[iDate] || "").trim(),
-        cover: (r[iCover] || "").trim(),
+        title: r[iTitle] || "",
+        author: r[iAuthor] || "",
+        synopsis: r[iSynopsis] || "",
+        date: r[iDate] || "",
+        month: r[iDate] || "",
+        cover: r[iCover] || "",
       };
       if (status === "current" && !current) current = entry;
       else if (status === "past") pastReads.push(entry);

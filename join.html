@@ -132,15 +132,15 @@
 <section>
   <div class="join__kicker">Come Read With Us</div>
   <h2 class="join__title">Join the Nightingale Society</h2>
-  <p class="join__desc" id="joinDesc">[Placeholder, a short, warm invitation: who the club is for, what membership involves, and any dues/commitment info.]</p>
+  <p class="join__desc">[Placeholder, a short, warm invitation: who the club is for, what membership involves, and any dues/commitment info.]</p>
   <div class="join__actions">
-    <a class="join__btn join__btn--primary" id="joinEmailBtn" href="mailto:[club@email.com]">Email Us to Join</a>
-    <a class="join__btn join__btn--ghost" id="joinRsvpBtn" href="[RSVP/signup form link]">RSVP to Next Meeting</a>
+    <a class="join__btn join__btn--primary" href="mailto:[club@email.com]">Email Us to Join</a>
+    <a class="join__btn join__btn--ghost" href="[RSVP/signup form link]">RSVP to Next Meeting</a>
   </div>
   <div class="join__contact">
-    Questions? Reach us at <a id="joinEmailLink" href="mailto:[club@email.com]">[club@email.com]</a>
+    Questions? Reach us at <a href="mailto:[club@email.com]">[club@email.com]</a>
     <div class="join__social">
-      <a id="joinInstagramLink" href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.instagram.com/societynightingale/" target="_blank" rel="noopener">Instagram</a>
     </div>
   </div>
 </section>
@@ -151,70 +151,6 @@
 
 <script>
   document.getElementById('nsYear').textContent = new Date().getFullYear();
-
-  // ---- Live source: Google Sheet ("Join" tab) ----
-  const SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
-  const SHEET_TAB = "Join";
-  const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
-  const FETCH_TIMEOUT_MS = 6000;
-
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (inQuotes) {
-        if (c === '"') {
-          if (text[i + 1] === '"') { field += '"'; i++; }
-          else { inQuotes = false; }
-        } else {
-          field += c;
-        }
-      } else if (c === '"') {
-        inQuotes = true;
-      } else if (c === ',') {
-        row.push(field); field = "";
-      } else if (c === '\r') {
-        // skip, \n below ends the row
-      } else if (c === '\n') {
-        row.push(field); field = "";
-        rows.push(row); row = [];
-      } else {
-        field += c;
-      }
-    }
-    if (field.length || row.length) { row.push(field); rows.push(row); }
-    return rows.filter(r => r.some(v => v.trim() !== ""));
-  }
-
-  function rowsToFieldMap(csvText) {
-    const [, ...body] = parseCSV(csvText);
-    const map = {};
-    for (const r of body) {
-      if (r[0]) map[r[0].trim().toLowerCase()] = (r[1] || "").trim();
-    }
-    return map;
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  fetch(SHEET_CSV_URL, { signal: controller.signal, cache: "no-store" })
-    .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
-    .then(csvText => {
-      const f = rowsToFieldMap(csvText);
-      if (f.description) document.getElementById('joinDesc').textContent = f.description;
-      if (f.email) {
-        document.getElementById('joinEmailBtn').href = `mailto:${f.email}`;
-        document.getElementById('joinEmailLink').href = `mailto:${f.email}`;
-        document.getElementById('joinEmailLink').textContent = f.email;
-      }
-      if (f['rsvp link']) document.getElementById('joinRsvpBtn').href = f['rsvp link'];
-      if (f.instagram) document.getElementById('joinInstagramLink').href = f.instagram;
-    })
-    .catch(err => {
-      console.warn("Nightingale: couldn't load live Join sheet, showing fallback content.", err);
-    })
-    .finally(() => clearTimeout(timeout));
 </script>
 
 </body>

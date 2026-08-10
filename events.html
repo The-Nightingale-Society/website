@@ -138,91 +138,23 @@
 <script>
   document.getElementById('nsYear').textContent = new Date().getFullYear();
 
-  // ---- Live source: Google Sheet ("Events" tab) ----
-  const SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
-  const SHEET_TAB = "Events";
-  const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
-  const FETCH_TIMEOUT_MS = 6000;
-
-  // One object per event, soonest first. Used only if the live sheet can't
-  // be reached.
-  const FALLBACK_EVENTS = [
+  // One object per event, soonest first. Add or remove entries freely.
+  const events = [
     { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Monthly Discussion]", meta: "[Time] · [In-person location or Virtual link]", desc: "[Placeholder description of the event: what to expect, what to bring, RSVP details.]" },
     { month: "[Mon]", day: "[DD]", title: "[Event Title, e.g. Writing Competition Kickoff]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
     { month: "[Mon]", day: "[DD]", title: "[Event Title]", meta: "[Time] · [Location]", desc: "[Placeholder description.]" },
   ];
 
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (inQuotes) {
-        if (c === '"') {
-          if (text[i + 1] === '"') { field += '"'; i++; }
-          else { inQuotes = false; }
-        } else {
-          field += c;
-        }
-      } else if (c === '"') {
-        inQuotes = true;
-      } else if (c === ',') {
-        row.push(field); field = "";
-      } else if (c === '\r') {
-        // skip, \n below ends the row
-      } else if (c === '\n') {
-        row.push(field); field = "";
-        rows.push(row); row = [];
-      } else {
-        field += c;
-      }
-    }
-    if (field.length || row.length) { row.push(field); rows.push(row); }
-    return rows.filter(r => r.some(v => v.trim() !== ""));
-  }
-
-  function rowsToEvents(csvText) {
-    const rows = parseCSV(csvText);
-    const [header, ...body] = rows;
-    const idx = name => header.findIndex(h => h.trim().toLowerCase() === name);
-    const iMonth = idx("month"), iDay = idx("day"), iTitle = idx("title"),
-          iMeta = idx("meta"), iDesc = idx("description");
-    return body.map(r => ({
-      month: (r[iMonth] || "").trim(),
-      day: (r[iDay] || "").trim(),
-      title: (r[iTitle] || "").trim(),
-      meta: (r[iMeta] || "").trim(),
-      desc: (r[iDesc] || "").trim(),
-    }));
-  }
-
-  function renderEvents(events) {
-    document.getElementById('eventsList').innerHTML = events.map(e => `
-      <div class="event">
-        <div class="event__date"><span class="month">${e.month}</span><span class="day">${e.day}</span></div>
-        <div class="event__body">
-          <h3 class="event__title">${e.title}</h3>
-          <p class="event__meta">${e.meta}</p>
-          <p class="event__desc">${e.desc}</p>
-        </div>
+  document.getElementById('eventsList').innerHTML = events.map(e => `
+    <div class="event">
+      <div class="event__date"><span class="month">${e.month}</span><span class="day">${e.day}</span></div>
+      <div class="event__body">
+        <h3 class="event__title">${e.title}</h3>
+        <p class="event__meta">${e.meta}</p>
+        <p class="event__desc">${e.desc}</p>
       </div>
-    `).join('');
-  }
-
-  renderEvents(FALLBACK_EVENTS);
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  fetch(SHEET_CSV_URL, { signal: controller.signal, cache: "no-store" })
-    .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
-    .then(csvText => {
-      const events = rowsToEvents(csvText);
-      if (events.length) renderEvents(events);
-    })
-    .catch(err => {
-      console.warn("Nightingale: couldn't load live Events sheet, showing fallback content.", err);
-    })
-    .finally(() => clearTimeout(timeout));
+    </div>
+  `).join('');
 </script>
 
 </body>

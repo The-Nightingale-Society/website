@@ -27,23 +27,9 @@ Every page shares the same nav bar and footer (see the `.site-nav` / `.site-foot
 
 The `.nojekyll` file at the repo root tells GitHub Pages to serve the files as-is instead of running them through Jekyll (not needed for a plain HTML site, and Jekyll would otherwise ignore some file patterns by default).
 
-## Live content: one Google Sheet drives almost the whole site
+## Live content: Currently Reading & Past Reads
 
-Every page except the nav/footer chrome pulls its content from **[Nightingale Society — Website Content](https://docs.google.com/spreadsheets/d/1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s/edit)** on every page load — no commit needed to change content. See `UPDATING-CONTENT.md` for the volunteer-facing guide; the short version:
-
-| Sheet tab | Page(s) |
-|---|---|
-| Reads | `reads.html` (Currently Reading / Past Reads), and the flying book covers on `index.html` |
-| Events | `events.html` |
-| About | `about.html` (mission paragraph) |
-| Team | `about.html` (team cards) |
-| Writing | `writing.html` (competition facts) |
-| Essays | `writing.html` (essay cards) |
-| Join | `join.html` |
-
-The sheet must stay shared as "Anyone with the link — Viewer" or the site can't read it. If that ever breaks, each page falls back to content hardcoded in the file (`FALLBACK_*` constants near the bottom of each `<script>`) rather than showing anything broken. Because these are real top-level pages (not iframe embeds), there's no sandbox uncertainty about the fetch working — it just works.
-
-There's no tooling to add tabs to an *existing* Google Sheet from outside Sheets itself, so if the sheet ever needs to be rebuilt from scratch, the cleanest path is a new file with the same tab names/columns, with its ID swapped into the `SHEET_ID` constant near the top of each page's `<script>` (and the sheet needs re-sharing, since sharing doesn't carry over to a new file).
+Unlike every other page, `reads.html` doesn't need a new commit when the book pick changes — it fetches live from a Google Sheet on every page load: **[Nightingale Society — Website Content](https://docs.google.com/spreadsheets/d/1pULfn9fQH4S8YiucXL0LiDyVxicLmAZ95svPWh9MDDk/edit)** (see its "Read Me" tab). Edit the sheet, reload the page, done — see `UPDATING-CONTENT.md` for the exact steps. The sheet must stay shared as "Anyone with the link — Viewer"; if that ever breaks, the page falls back to the content hardcoded in the file rather than showing anything broken. Because this is now a real top-level page (not an iframe embed), there's no sandbox uncertainty about the fetch working — it just works. This is the first section built this way — the plan is to extend the same pattern (one sheet tab per section) to Events, Team, and the rest over time.
 
 ## Images just work now
 
@@ -64,7 +50,15 @@ The `try/catch` around WebGL setup hides the canvas gracefully if three.js ever 
 
 ## Writing Competition / Essays — adding real essays later
 
-This is now sheet-driven (see above) — open the **Essays** tab in the Google Sheet, one row per essay. Leave `Status = pending` and `Link` blank for unpublished entries — renders as a "Coming Soon" card. Once an essay is ready, set `Status = published` and `Link` to wherever the full essay lives. No commit needed; see `UPDATING-CONTENT.md`.
+Open `writing.html` and find the `essays` array near the bottom (inside the `<script>` tag). Each entry looks like:
+
+```js
+{ title: "Essay Title", author: "Author Name", blurb: "One-line teaser or status", status: "pending", link: "" }
+```
+
+- Leave `status: "pending"` and `link: ""` for unpublished entries — renders as a "Coming Soon" card.
+- Once an essay is ready, set `status: "published"` and `link` to wherever the full essay lives (a shared Google Doc link, a PDF, or a new page in this repo).
+- Add or remove objects in the array for however many entries you have, then commit and push — GitHub Pages redeploys automatically.
 
 ## Legacy: `embeds/` (Google Sites paste-in versions)
 

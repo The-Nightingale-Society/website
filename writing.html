@@ -176,13 +176,13 @@
 <section>
   <div class="comp">
     <div class="comp__kicker">Now Accepting Entries</div>
-    <h1 class="comp__title"><span id="compYear">[Year]</span> Writing Competition</h1>
-    <p class="comp__desc" id="compDesc">[Placeholder, describe the competition: theme, who can enter, word count, judging criteria, and how winners are chosen.]</p>
+    <h1 class="comp__title">[Year] Writing Competition</h1>
+    <p class="comp__desc">[Placeholder, describe the competition: theme, who can enter, word count, judging criteria, and how winners are chosen.]</p>
     <div class="comp__facts">
-      <div class="comp__fact"><span class="label">Theme</span><span class="value" id="compTheme">[Theme]</span></div>
-      <div class="comp__fact"><span class="label">Deadline</span><span class="value" id="compDeadline">[Date]</span></div>
-      <div class="comp__fact"><span class="label">Prize</span><span class="value" id="compPrize">[Prize]</span></div>
-      <div class="comp__fact"><span class="label">Submit To</span><span class="value" id="compSubmitTo">[Email]</span></div>
+      <div class="comp__fact"><span class="label">Theme</span><span class="value">[Theme]</span></div>
+      <div class="comp__fact"><span class="label">Deadline</span><span class="value">[Date]</span></div>
+      <div class="comp__fact"><span class="label">Prize</span><span class="value">[Prize]</span></div>
+      <div class="comp__fact"><span class="label">Submit To</span><span class="value">[Email]</span></div>
     </div>
   </div>
 
@@ -198,120 +198,30 @@
 <script>
   document.getElementById('nsYear').textContent = new Date().getFullYear();
 
-  // ---- Live source: Google Sheet ("Writing" + "Essays" tabs) ----
-  const SHEET_ID = "1ROOwcdW6NzdlVxAoMm2XwHDUNeS1P2yLajQpHyYAv7s";
-  const FETCH_TIMEOUT_MS = 6000;
-
-  function sheetCsvUrl(tab) {
-    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
-  }
-
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      if (inQuotes) {
-        if (c === '"') {
-          if (text[i + 1] === '"') { field += '"'; i++; }
-          else { inQuotes = false; }
-        } else {
-          field += c;
-        }
-      } else if (c === '"') {
-        inQuotes = true;
-      } else if (c === ',') {
-        row.push(field); field = "";
-      } else if (c === '\r') {
-        // skip, \n below ends the row
-      } else if (c === '\n') {
-        row.push(field); field = "";
-        rows.push(row); row = [];
-      } else {
-        field += c;
-      }
-    }
-    if (field.length || row.length) { row.push(field); rows.push(row); }
-    return rows.filter(r => r.some(v => v.trim() !== ""));
-  }
-
-  function fetchCsv(tab) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    return fetch(sheetCsvUrl(tab), { signal: controller.signal, cache: "no-store" })
-      .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
-      .finally(() => clearTimeout(timeout));
-  }
-
-  function rowsToFieldMap(csvText) {
-    const [, ...body] = parseCSV(csvText);
-    const map = {};
-    for (const r of body) {
-      if (r[0]) map[r[0].trim().toLowerCase()] = (r[1] || "").trim();
-    }
-    return map;
-  }
-
-  function rowsToEssays(csvText) {
-    const rows = parseCSV(csvText);
-    const [header, ...body] = rows;
-    const idx = name => header.findIndex(h => h.trim().toLowerCase() === name);
-    const iTitle = idx("title"), iAuthor = idx("author"), iBlurb = idx("blurb"),
-          iStatus = idx("status"), iLink = idx("link");
-    return body.map(r => ({
-      title: (r[iTitle] || "").trim(),
-      author: (r[iAuthor] || "").trim(),
-      blurb: (r[iBlurb] || "").trim(),
-      status: (r[iStatus] || "").trim().toLowerCase(),
-      link: (r[iLink] || "").trim(),
-    }));
-  }
-
-  fetchCsv("Writing")
-    .then(csvText => {
-      const f = rowsToFieldMap(csvText);
-      if (f.year) document.getElementById('compYear').textContent = f.year;
-      if (f.theme) document.getElementById('compTheme').textContent = f.theme;
-      if (f.deadline) document.getElementById('compDeadline').textContent = f.deadline;
-      if (f.prize) document.getElementById('compPrize').textContent = f.prize;
-      if (f['submit to']) document.getElementById('compSubmitTo').textContent = f['submit to'];
-      if (f.description) document.getElementById('compDesc').textContent = f.description;
-    })
-    .catch(err => console.warn("Nightingale: couldn't load live Writing sheet, showing fallback content.", err));
-
-  // Used only if the live sheet can't be reached. Until an essay is ready,
-  // status stays "pending" and the card renders as "Coming Soon".
-  const FALLBACK_ESSAYS = [
+  // Add one object per essay. Until an essay is ready, leave link empty and
+  // status: "pending" — the card will render as "Coming Soon". Once it's
+  // ready to publish, set status: "published" and fill in the link (a URL
+  // to a Google Doc, PDF, or a new page with the full essay).
+  const essays = [
     { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
     { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
     { title: "[Essay Title]", author: "[Author Name]", blurb: "Coming soon. Check back after judging wraps up.", status: "pending", link: "" },
   ];
 
-  function renderEssays(essays) {
-    const grid = document.getElementById('essaysGrid');
-    grid.innerHTML = essays.map(e => `
-      <div class="essay-card">
-        <span class="essay-card__status essay-card__status--${e.status === 'published' ? 'published' : 'pending'}">
-          ${e.status === 'published' ? 'Published' : 'Coming Soon'}
-        </span>
-        <h3 class="essay-card__title">${e.title}</h3>
-        <p class="essay-card__author">by ${e.author}</p>
-        <p class="essay-card__blurb">${e.blurb}</p>
-        ${e.status === 'published' && e.link
-          ? `<a class="essay-card__link" href="${e.link}" target="_blank" rel="noopener">Read the essay &rarr;</a>`
-          : `<span class="essay-card__link" aria-disabled="true">Read the essay &rarr;</span>`}
-      </div>
-    `).join('');
-  }
-
-  renderEssays(FALLBACK_ESSAYS);
-
-  fetchCsv("Essays")
-    .then(csvText => {
-      const essays = rowsToEssays(csvText);
-      if (essays.length) renderEssays(essays);
-    })
-    .catch(err => console.warn("Nightingale: couldn't load live Essays sheet, showing fallback content.", err));
+  const grid = document.getElementById('essaysGrid');
+  grid.innerHTML = essays.map(e => `
+    <div class="essay-card">
+      <span class="essay-card__status essay-card__status--${e.status === 'published' ? 'published' : 'pending'}">
+        ${e.status === 'published' ? 'Published' : 'Coming Soon'}
+      </span>
+      <h3 class="essay-card__title">${e.title}</h3>
+      <p class="essay-card__author">by ${e.author}</p>
+      <p class="essay-card__blurb">${e.blurb}</p>
+      ${e.status === 'published' && e.link
+        ? `<a class="essay-card__link" href="${e.link}" target="_blank" rel="noopener">Read the essay &rarr;</a>`
+        : `<span class="essay-card__link" aria-disabled="true">Read the essay &rarr;</span>`}
+    </div>
+  `).join('');
 </script>
 
 </body>
